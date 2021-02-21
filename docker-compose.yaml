@@ -1,0 +1,50 @@
+version: "3.7"
+services:
+  # reader server to read all incoming beacon
+  yin:
+    build:
+      context: .
+      dockerfile: yin.dockerfile
+    container_name: yin-container
+    depends_on:
+      - redis
+    image: yin-image
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    ports:
+      - "1000:1000"
+    # volumes:
+    # - file-storage:/root/store
+    # - file-storage:/root/just.txt:ro
+    expose:
+      - "1000"
+    restart: always
+    networks:
+      - yin-network
+
+  redis:
+    image: "bitnami/redis:latest"
+    container_name: redis-container
+    ports:
+      - "6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-storage:/bitnami'
+    networks:
+      - yin-network
+
+# global network for entire system
+networks:
+  yin-network:
+    driver: bridge
+    name: yin-network
+
+# storage for yin server.
+volumes:
+  # file-storage:
+  #   name: file-storage
+  redis-storage:
+    name: redis-storage
